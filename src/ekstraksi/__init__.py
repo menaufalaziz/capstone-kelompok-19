@@ -8,5 +8,6 @@ dan catat asal tiap baris (`_berkas_raw` relatif data/raw/, `_sha256_raw` dari s
 
 def jalankan():
     """Kembalikan {nama_sumber: DataFrame mentah}."""
-    df, _ = baca_bps()
-    return {"bps" : df}
+    bps, _ = baca_bps()
+    wdi, _ = baca_wdi()
+    return {"bps" : bps, **wdi}
