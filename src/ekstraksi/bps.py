@@ -100,6 +100,36 @@ def baca_bps(raw=RAW, desimal="."):
         jumlah[b] = len(df)
     return pd.concat(bagian, ignore_index=True), jumlah
 
+def baca_asal(berkas, raw=RAW, encoding="utf-8-sig"):
+    """manifest_asal.json (metadata unduhan BPS) -> satu baris per tabel di `tabel`. Daftar disimpan sebagai teks JSON."""
+    with open(Path(raw) / berkas, encoding=encoding) as f:
+        d = json.load(f)
+    gagal = d.get("gagal") or {}
+    if gagal:
+        raise ValueError(f"{berkas}: ada tabel gagal diunduh: {list(gagal)[:5]}")
+    baris = []
+    for kode, t in d["tabel"].items():
+        r = {"tabel_kode": kode, "sumber": d.get("sumber"), "domain": d.get("domain"),
+             "skrip": d.get("skrip"), "diunduh": d.get("diunduh")}
+        for k, v in t.items():
+            r[k if k != "diunduh" else "diunduh_tabel"] = json.dumps(v, ensure_ascii=False) if isinstance(v, (list, dict)) else v
+        baris.append(r)
+    df = pd.DataFrame(baris)
+    df["_format"] = "json"
+    df["_berkas_raw"] = str(berkas)
+    df["_sha256_raw"] = sha256_raw(berkas, RAW)
+    return df
+
+
+def baca_bps_asal(raw=RAW):
+    """Baca semua bps/<snapshot>/manifest_asal.json. Mengembalikan (DataFrame, {berkas: jumlah_baris})."""
+    raw = Path(raw)
+    bagian, jumlah = [], {}
+    for p in sorted(raw.glob("bps/*/manifest_asal.json")):
+        b = p.relative_to(raw).as_posix()
+        bagian.append(baca_asal(b, raw))
+        jumlah[b] = len(bagian[-1])
+    return pd.concat(bagian, ignore_index=True), jumlah
 
 if __name__ == "__main__":
     df, jumlah = baca_bps()
