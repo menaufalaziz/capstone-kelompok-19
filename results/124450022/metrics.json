@@ -1,0 +1,14 @@
+{
+  "metrik": {
+    "baris_silver": 1283,
+    "sel_kosong_grid": 72,
+    "outlier_ditandai": 85,
+    "keputusan_dicatat": 10,
+    "seri_diproses": 5,
+    "wilayah_tercakup": 39,
+    "berkas_sumber": 5
+  },
+  "seed": 0,
+  "data_hash": "a710b64ec69ad2bf533f4f33e07b5dd89ea27d2368f0356724f6ed8a5d0bf71f",
+  "perangkat": "Windows AMD64 Python 3.13.7"
+}
