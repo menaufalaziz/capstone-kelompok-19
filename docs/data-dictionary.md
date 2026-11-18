@@ -19,7 +19,8 @@ Hasil audit terhadap judul tabel dan metadata berkas mentah. Sumber kebenaran ko
 | `EN.POP.SLUM.UR.ZS` | wdi | Population living in slums (% of urban population) | — | persen | 11.1.1 | judul "% of urban population", `unit` kosong, nilai 19,41–35,13; `sourceNote` WDI menyebut Sustainable Development Goal 11.1.1 |
 
 Koreksi satuan hanya mengubah label, bukan nilai mentah. Konversi (mis. ton ke kg) dilakukan di Gold
-bila diperlukan. Semua seri tahunan; Silver tidak merata-ratakan periode semester/bulan ke tahunan.
+bila diperlukan. `src/silver/bangun.py` mengambil `satuan` dari katalog ini, bukan dari kolom mentah.
+Semua seri tahunan; Silver tidak merata-ratakan periode semester/bulan ke tahunan.
 Keputusan K-007 (placeholder satuan 2012/2013) dan label KG pada K-003 disempurnakan oleh K-011,
 K-012, dan K-013 di `log-keputusan.csv`.
 

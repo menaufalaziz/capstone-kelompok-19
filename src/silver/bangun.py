@@ -4,6 +4,7 @@ import pandas as pd
 
 from src.common.manifest import sha256_raw
 from src.common.skema import KOLOM, periksa_silver
+from src.silver.katalog import satuan as satuan_katalog
 
 ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "data" / "raw" / "bps" / "2026-10-20"
@@ -29,9 +30,9 @@ def bangun_silver():
             if seri == 2753 and int(baris["wilayah_id"]) == 9999:
                 continue
 
-            satuan = str(baris["satuan"]).strip()
-            if not satuan or satuan.lower() == "nan":
-                satuan = "Tidak dinyatakan dalam sumber"
+            # Keputusan K-011 s.d. K-014: satuan final dari katalog hasil audit,
+            # bukan kolom satuan mentah (2753 = ton; 2012/2013 = persen).
+            satuan = satuan_katalog(f"var{seri}")
 
             rincian = str(baris["turvar"]).strip()
             if not rincian or rincian.lower() == "nan":
