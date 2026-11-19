@@ -28,8 +28,22 @@ K-012, dan K-013 di `log-keputusan.csv`.
 
 | Kolom | Tipe | Satuan/format | Boleh kosong | Rentang atau nilai sah | Asal (berkas/aturan) | Keterangan |
 |---|---|---|---|---|---|---|
-| sumber | string | — | tidak | bps, bnpb, wdi, who_gho, ilostat | nama folder data/raw | |
-| wilayah_kode | int | kode BPS x 100 | tidak | 9999 atau 1100–9600 | log K-… | |
+| sumber | string | — | tidak | `bps`, `wdi` | nama folder data/raw | |
+| seri_kode | string | kode seri sumber | tidak | `1241`, `2012`, `2013`, `2753`, `2754`, `EN.POP.SLUM.UR.ZS` | `var_id` BPS; `indicator.id` WDI | |
+| wilayah_kode | int | kode BPS x 100 | tidak | 9999 atau 1100–9700 | `wilayah_id`; WDI = 9999 | 9999 = Indonesia |
+| nama_wilayah | string | huruf kapital | tidak | nama wilayah sumber | `wilayah` BPS; `country.value` WDI | |
+| periode | string | `YYYY` | tidak | 2000–2025 | `tahun` BPS; `date` WDI | semua seri tahunan |
+| jenis_periode | string | — | tidak | `tahun` | kolom `periode` BPS | tidak ada periode semester/bulan (K-016) |
+| rincian | string | kategori sumber | tidak | `Tidak ada`, `Bongkar`, `Muat` | `turvar` BPS; WDI tidak punya rincian | disimpan apa adanya untuk dipilih di Gold |
+| nilai | float | sesuai `satuan` | tidak | ≥ 0; persen 0–100 | `nilai` BPS; `value` WDI | observasi kosong tidak dimasukkan |
+| satuan | string | — | tidak | `persen`, `ton`, `kilogram` | `src/silver/katalog.py` | koreksi label K-011 s.d. K-015 |
+| _berkas_raw | string | path relatif `data/raw/` | tidak | 6 berkas | tahap ekstraksi | satu seri memakai satu berkas CSV/WDI |
+| _sha256_raw | string | hex 64 karakter | tidak | sha256 berkas | `src.common.manifest.sha256_raw` | lineage ke MANIFEST.csv |
+
+Kunci unik: `sumber + seri_kode + wilayah_kode + periode + rincian + _berkas_raw`.
+Silver Sprint 1 berisi 1.295 baris: 1.283 baris BPS dan 12 observasi WDI bernilai.
+Rincian Bongkar/Muat tetap menjadi baris terpisah; pemilihan rincian yang sebanding,
+grid 38 provinsi, dan rekonsiliasi pembanding dikerjakan di Gold (Sprint 2).
 
 ## data/gold/<tabel>.parquet
 

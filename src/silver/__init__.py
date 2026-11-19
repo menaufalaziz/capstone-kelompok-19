@@ -8,4 +8,6 @@ TIDAK digabung di sini. Setiap keputusan pembersihan dicatat di log-keputusan.cs
 
 def jalankan(mentah):
     """Terima keluaran tahap 1, tulis dan kembalikan DataFrame Silver."""
-    raise NotImplementedError("Tahap 2–4: profil, missing, outlier/patahan, duplikat, format periode dan wilayah")
+    from src.silver.bangun import bangun_silver
+
+    return bangun_silver(mentah)
