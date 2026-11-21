@@ -1,9 +1,9 @@
 # Rekonsiliasi nasional — persiapan Tahap 6
 
-Dibangkitkan oleh `python -m src.gold.rekonsiliasi`. Tabel nasional: `nasional_periode_seri.csv` (lebar, periode x seri)
-dan `nasional_long.csv` (dengan `_berkas_raw` dan `_sha256_raw`). Baris Indonesia seri BPS dari hasil ekstraksi
-(CSV snapshot 2026-10-20); WDI dari Silver. Satuan var2753 ton dan var2754 kilogram (K-013, K-014): nilai kedua seri
-tidak sebanding langsung.
+Tabel nasional lebar (periode x seri) tersedia di `table_nasional.csv`. Baris Indonesia seri BPS diambil dari hasil
+ekstraksi (CSV snapshot 2026-10-20); WDI dari Silver. Skrip pembangkit khusus belum di-commit, dan versi panjang
+(`nasional_long.csv` dengan `_berkas_raw`/`_sha256_raw`) belum dibuat; keduanya dikerjakan pada Sprint 2.
+Satuan var2753 ton dan var2754 kilogram (K-013, K-014): nilai kedua seri tidak sebanding langsung.
 
 ## Daftar pasangan
 
