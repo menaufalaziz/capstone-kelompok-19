@@ -8,6 +8,7 @@ Dihasilkan otomatis oleh `python pipeline.py` (tahap 8).
 - Seri Silver: 6
 - Wilayah Silver: 39
 - Berkas sumber Silver: 6
+- Baris patahan metodologi: 35
 - Hasil: LOLOS
 
 ## Pemeriksaan
@@ -15,6 +16,8 @@ Dihasilkan otomatis oleh `python pipeline.py` (tahap 8).
 | Pemeriksaan | Hasil |
 |---|---|
 | Skema minimal dan lineage MANIFEST | lolos |
-| Kunci unik sumber, seri_kode, wilayah_kode, periode, rincian, _berkas_raw | lolos |
-| Rentang persen 0–100 dan berat tidak negatif | lolos |
+| Keunikan kunci Silver | lolos |
+| Rentang persen dan berat | lolos |
+| Konsistensi satuan Silver | lolos |
+| Penanda patahan metodologi | lolos |
 | Tabel dasar Gold | lolos |

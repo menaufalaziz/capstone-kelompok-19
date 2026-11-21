@@ -39,9 +39,12 @@ K-012, dan K-013 di `log-keputusan.csv`.
 | satuan | string | — | tidak | `persen`, `ton`, `kilogram` | `src/silver/katalog.py` | koreksi label K-011 s.d. K-015 |
 | _berkas_raw | string | path relatif `data/raw/` | tidak | 6 berkas | tahap ekstraksi | satu seri memakai satu berkas CSV/WDI |
 | _sha256_raw | string | hex 64 karakter | tidak | sha256 berkas | `src.common.manifest.sha256_raw` | lineage ke MANIFEST.csv |
+| penanda_patahan | string | label keputusan | tidak (string kosong) | `""`, `patahan_metodologi` | aturan K-010 di `src/silver/bangun.py` | 35 baris var1241 tahun 2019; nilai asli tidak diubah |
 
 Kunci unik: `sumber + seri_kode + wilayah_kode + periode + rincian + _berkas_raw`.
 Silver Sprint 1 berisi 1.295 baris: 1.283 baris BPS dan 12 observasi WDI bernilai.
+Sebanyak 35 baris var1241 tahun 2019 diberi `penanda_patahan = patahan_metodologi` (K-010);
+kolom ini hanya penanda, bukan perubahan nilai.
 Rincian Bongkar/Muat tetap menjadi baris terpisah; pemilihan rincian yang sebanding,
 grid 38 provinsi, dan rekonsiliasi pembanding dikerjakan di Gold (Sprint 2).
 
