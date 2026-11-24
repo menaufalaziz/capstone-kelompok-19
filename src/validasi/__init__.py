@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+"""Tahap 8 — validasi minimum Silver dan tabel Gold (pertemuan XIV–XV).
+
+Pemeriksaan ini adalah lantai tambahan di atas src/common/skema.py: rentang nilai
+per satuan, kelengkapan kolom, keunikan kunci, dan lineage ke MANIFEST.csv,
+serta keunikan kunci panel Gold dan konsistensi status sel.
+Laporan hasil ditulis ke reports/validasi.md setiap kali pipeline berjalan.
+=======
 
 """Tahap 8 - validasi minimum Silver dan tabel dasar Gold.
 
@@ -5,6 +13,7 @@ Pemeriksaan meliputi skema, lineage MANIFEST, keunikan kunci,
 rentang nilai, konsistensi satuan, penanda patahan, dan tabel dasar Gold.
 
 Laporan ditulis ke reports/validasi.md setiap kali pipeline berjalan.
+>>>>>>> origin/main
 """
 
 from pathlib import Path
@@ -109,6 +118,40 @@ def _periksa_patahan(silver):
 
 def _periksa_gold(gold):
     salah = []
+<<<<<<< HEAD
+    panel_dasar = gold.get("panel_dasar")
+    if panel_dasar is not None and not panel_dasar.empty:
+        if panel_dasar.duplicated(KUNCI).any():
+            salah.append("tabel dasar Gold punya kunci Silver kembar")
+        if not {"kode_prov", "tingkat"}.issubset(panel_dasar.columns):
+            salah.append("tabel dasar Gold tidak memuat kolom kode_prov/tingkat")
+
+    p = gold.get("panel")
+    if p is None or p.empty:
+        salah.append("tabel panel Gold kosong")
+        return salah
+
+    # 1. Kunci panel unik
+    kunci_panel = ["indikator", "wilayah_kode", "periode"]
+    if p.duplicated(kunci_panel).any():
+        ganda = p[p.duplicated(kunci_panel, keep=False)]
+        salah.append(f"{len(ganda)} baris kunci panel Gold kembar pada {kunci_panel}")
+
+    # 2. Status sel baku dan sinkronisasi dengan nilai
+    status_sah = {"terisi", "missing", "tidak_diterbitkan", "belum_ada", "batas_lama"}
+    luar_status = ~p["status_sel"].isin(status_sah)
+    if luar_status.any():
+        salah.append(f"{int(luar_status.sum())} baris memiliki status_sel di luar daftar baku")
+
+    tidak_sinkron = (p["status_sel"] == "terisi") != p["nilai"].notna()
+    if tidak_sinkron.any():
+        salah.append(f"{int(tidak_sinkron.sum())} baris status_sel != nilai (terisi harus bernilai, kosong harus NaN)")
+
+    # 3. Satu satuan per indikator
+    sat_unik = p.groupby("indikator")["satuan"].nunique()
+    if (sat_unik != 1).any():
+        salah.append("terdapat indikator yang memiliki lebih dari satu satuan")
+=======
 
     panel = gold.get("panel_dasar")
 
@@ -124,6 +167,7 @@ def _periksa_gold(gold):
         salah.append(
             "tabel dasar Gold tidak memuat kolom kode_prov dan tingkat"
         )
+>>>>>>> origin/main
 
     return salah
 
@@ -132,6 +176,9 @@ def jalankan(silver, gold):
     # Pemeriksaan skema dan lineage MANIFEST.
     salah_skema = []
 
+<<<<<<< HEAD
+    panel = gold.get("panel", pd.DataFrame())
+=======
     try:
         hasil_skema = periksa_silver(silver, baca_manifest())
 
@@ -173,6 +220,7 @@ def jalankan(silver, gold):
             semua_salah.append(f"{nama}: {pesan}")
 
     # Menyusun laporan validasi.
+>>>>>>> origin/main
     baris = [
         "# Laporan validasi",
         "",
@@ -184,14 +232,27 @@ def jalankan(silver, gold):
         f"- Seri Silver: {silver['seri_kode'].nunique()}",
         f"- Wilayah Silver: {silver['wilayah_kode'].nunique()}",
         f"- Berkas sumber Silver: {silver['_berkas_raw'].nunique()}",
+<<<<<<< HEAD
+        f"- Baris Panel Gold: {len(panel):,} (7 indikator, 38 provinsi)",
+        f"- Hasil: {'LOLOS' if not salah else 'GAGAL'}",
+=======
         f"- Baris patahan metodologi: "
         f"{int(silver['penanda_patahan'].eq('patahan_metodologi').sum())}",
         f"- Hasil: {'LOLOS' if not semua_salah else 'GAGAL'}",
+>>>>>>> origin/main
         "",
         "## Pemeriksaan",
         "",
         "| Pemeriksaan | Hasil |",
         "|---|---|",
+<<<<<<< HEAD
+        f"| Skema minimal dan lineage MANIFEST | {'lolos' if not list(periksa_silver(silver, baca_manifest())) else 'gagal'} |",
+        f"| Kunci unik Silver {', '.join(KUNCI)} | {'lolos' if not silver.duplicated(KUNCI).any() else 'gagal'} |",
+        f"| Rentang persen 0–100 dan berat tidak negatif | {'lolos' if not _periksa_rentang(silver) else 'gagal'} |",
+        f"| Integritas Panel Gold (kunci unik, status sel, satuan seragam) | {'lolos' if not _periksa_gold(gold) else 'gagal'} |",
+        "",
+=======
+>>>>>>> origin/main
     ]
 
     for nama, daftar_salah in pemeriksaan.items():
@@ -214,6 +275,11 @@ def jalankan(silver, gold):
             "Validasi gagal: " + "; ".join(semua_salah)
         )
 
+<<<<<<< HEAD
+    print(f"Validasi: {len(silver)} baris Silver, {len(panel)} baris Panel Gold")
+    print(f"Laporan: {LAPORAN}")
+    return {"silver": len(silver), "gold_panel": len(panel)}
+=======
     panel = gold.get("panel_dasar")
 
     print(
@@ -226,3 +292,4 @@ def jalankan(silver, gold):
         "silver": len(silver),
         "gold": len(panel),
     }
+>>>>>>> origin/main
