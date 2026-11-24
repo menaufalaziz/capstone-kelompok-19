@@ -460,6 +460,68 @@ def _periksa_gold(gold, silver):
     return salah
 
 
+def _periksa_kompatibilitas(gold):
+    """Periksa panel panjang/lebar/dasar yang dipakai laporan dan tes tim."""
+    salah = []
+
+    panel = gold.get("panel")
+    lebar = gold.get("panel_lebar")
+    dasar = gold.get("panel_dasar")
+
+    if panel is None or panel.empty:
+        return ["panel panjang kompatibilitas kosong"]
+
+    kunci = ["indikator", "wilayah_kode", "periode"]
+    if panel.duplicated(kunci).any():
+        salah.append(
+            f"panel panjang: {int(panel.duplicated(kunci).sum())} kunci kembar"
+        )
+
+    if len(panel) != 1330:
+        salah.append(f"panel panjang: {len(panel)} baris, seharusnya 1.330")
+
+    status_sah = {
+        "terisi",
+        "missing",
+        "tidak_diterbitkan",
+        "belum_ada",
+        "batas_lama",
+    }
+    if not set(panel["status_sel"].dropna().unique()).issubset(status_sah):
+        salah.append("panel panjang: status_sel di luar daftar baku")
+
+    sinkron = (panel["status_sel"] == "terisi") == panel["nilai"].notna()
+    if not sinkron.all():
+        salah.append(
+            f"panel panjang: {int((~sinkron).sum())} status_sel "
+            "tidak sinkron dengan nilai"
+        )
+
+    satuan = panel.groupby("indikator")["satuan"].nunique()
+    if (satuan != 1).any():
+        salah.append("panel panjang: ada indikator dengan lebih dari satu satuan")
+
+    if lebar is None or lebar.empty:
+        salah.append("panel lebar kompatibilitas kosong")
+    else:
+        if lebar.duplicated(["wilayah_kode", "periode"]).any():
+            salah.append("panel lebar: kunci wilayah-periode kembar")
+        if lebar.shape != (394, 11):
+            salah.append(
+                f"panel lebar: bentuk {lebar.shape}, seharusnya (394, 11)"
+            )
+
+    if dasar is None or dasar.empty:
+        salah.append("panel dasar kompatibilitas kosong")
+    else:
+        if dasar.duplicated(KUNCI).any():
+            salah.append("panel dasar: kunci Silver kembar")
+        if not {"kode_prov", "tingkat"}.issubset(dasar.columns):
+            salah.append("panel dasar: kolom kode_prov/tingkat tidak ada")
+
+    return salah
+
+
 def jalankan(silver, gold):
     # Pemeriksaan skema dan lineage MANIFEST.
     salah_skema = []
@@ -487,6 +549,7 @@ def jalankan(silver, gold):
     salah_satuan = _periksa_satuan(silver)
     salah_patahan = _periksa_patahan(silver)
     salah_gold = _periksa_gold(gold, silver)
+    salah_kompatibilitas = _periksa_kompatibilitas(gold)
 
     # Mengumpulkan seluruh pelanggaran.
     pemeriksaan = {
@@ -496,6 +559,7 @@ def jalankan(silver, gold):
         "Konsistensi satuan Silver": salah_satuan,
         "Penanda patahan metodologi": salah_patahan,
         "Panel Gold provinsi dan lineage": salah_gold,
+        "Panel Gold panjang/lebar kompatibilitas": salah_kompatibilitas,
     }
 
     semua_salah = []
@@ -506,6 +570,8 @@ def jalankan(silver, gold):
 
     panel_gold = gold.get("panel_provinsi")
     baris_gold = len(panel_gold) if panel_gold is not None else 0
+    panel_kompat = gold.get("panel")
+    baris_kompat = len(panel_kompat) if panel_kompat is not None else 0
     seri_panel = (
         panel_gold["seri_kode"].nunique()
         if panel_gold is not None and not panel_gold.empty
@@ -547,6 +613,7 @@ def jalankan(silver, gold):
         f"- Baris patahan metodologi: "
         f"{int(silver['penanda_patahan'].eq('patahan_metodologi').sum())}",
         f"- Baris panel Gold: {baris_gold:,}",
+        f"- Baris panel panjang kompatibilitas: {baris_kompat:,}",
         f"- Seri panel Gold: {seri_panel}",
         f"- Indikator panel Gold: {indikator_gold}",
         f"- Sel kosong panel Gold: {sel_kosong_gold}",

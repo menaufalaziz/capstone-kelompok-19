@@ -10,6 +10,7 @@ Dihasilkan otomatis oleh `python pipeline.py` (tahap 8).
 - Berkas sumber Silver: 6
 - Baris patahan metodologi: 35
 - Baris panel Gold: 1,330
+- Baris panel panjang kompatibilitas: 1,330
 - Seri panel Gold: 5
 - Indikator panel Gold: 7
 - Sel kosong panel Gold: 72
@@ -26,3 +27,4 @@ Dihasilkan otomatis oleh `python pipeline.py` (tahap 8).
 | Konsistensi satuan Silver | lolos |
 | Penanda patahan metodologi | lolos |
 | Panel Gold provinsi dan lineage | lolos |
+| Panel Gold panjang/lebar kompatibilitas | lolos |

@@ -1,4 +1,4 @@
-# Data dictionary — <Nama tim>
+# Data dictionary — <Kelompok 19>
 
 Satu tabel per keluaran (Silver dan setiap tabel Gold). Isi dari data nyata, bukan dari ingatan:
 tipe, satuan, rentang, dan jumlah kosong dihitung ulang setiap kali pipeline berjalan.
@@ -19,7 +19,7 @@ Hasil audit terhadap judul tabel dan metadata berkas mentah. Sumber kebenaran ko
 | `EN.POP.SLUM.UR.ZS` | wdi | Population living in slums (% of urban population) | — | persen | 11.1.1 | judul "% of urban population", `unit` kosong, nilai 19,41–35,13; `sourceNote` WDI menyebut Sustainable Development Goal 11.1.1 |
 
 Koreksi satuan hanya mengubah label, bukan nilai mentah. Konversi satuan dilakukan di Gold
-(K-018: var2754 kilogram menjadi ton) dengan nilai asli tetap disimpan. `src/silver/bangun.py`
+(K-024: var2754 kilogram menjadi ton) dengan nilai asli tetap disimpan. `src/silver/bangun.py`
 mengambil `satuan` dari katalog ini, bukan dari kolom mentah.
 Semua seri tahunan; Silver tidak merata-ratakan periode semester/bulan ke tahunan.
 Keputusan K-007 (placeholder satuan 2012/2013) dan label KG pada K-003 disempurnakan oleh K-011,
@@ -76,11 +76,11 @@ Untuk var2753 dan var2754, Bongkar dan Muat menjadi indikator terpisah.
 | tingkat | string | — | tidak | `provinsi` | aturan Gold | agregat nasional tidak ada di tabel ini |
 | sumber | string | — | tidak | `bps` | Silver | |
 | seri_kode | string | kode seri sumber | tidak | `var1241` s.d. `var2754` | Silver | |
-| satuan | string | satuan Gold | tidak | `persen`, `ton` | K-018 | satu satuan per tabel |
+| satuan | string | satuan Gold | tidak | `persen`, `ton` | K-024 | satu satuan per tabel |
 | satuan_asli | string | satuan Silver | tidak | `persen`, `ton`, `kilogram` | Silver | var2754 = kilogram |
-| nilai | float | sesuai `satuan` | ya | persen 0–100; ton ≥ 0 | Silver + K-018 | nilai setelah konversi satuan |
+| nilai | float | sesuai `satuan` | ya | persen 0–100; ton ≥ 0 | Silver + K-024 | nilai setelah konversi satuan |
 | nilai_asli | float | sesuai `satuan_asli` | ya | ≥ 0 | Silver | nilai sebelum konversi |
-| nilai_log10 | float | log10(nilai ton) | ya | hingga | K-019 | hanya terisi untuk indikator ton |
+| nilai_log10 | float | log10(nilai ton) | ya | hingga | K-025 | hanya terisi untuk indikator ton |
 | penanda_patahan | string | label keputusan | tidak | `""`, `patahan_metodologi` | K-010 | seluruh grid var1241 2019 |
 | _berkas_raw | string | path relatif `data/raw/` | ya | 5 berkas BPS | Silver | kosong pada sel grid |
 | _sha256_raw | string | hex 64 karakter | ya | sha256 berkas | Silver | kosong pada sel grid |
@@ -91,7 +91,8 @@ Kunci unik: `kode_prov + periode + indikator`. Sel tanpa observasi tetap ada
 dengan `nilai`, `nilai_asli`, dan kolom lineage bernilai kosong (`NaN`); tidak
 ada imputasi atau pengisian nol (K-005). Nilai ekstrem yang valid dipertahankan
 (K-009). Agregat nasional 9999 tidak masuk panel provinsi (K-004) dan tetap
-tersedia di Silver.
+tersedia di Silver. Tabel ini adalah varian unit-safe; panel panjang
+`panel.parquet` tetap mempertahankan satuan sumber per indikator.
 
 ## data/gold/panel_provinsi.parquet
 
@@ -112,3 +113,49 @@ Kolom lain sama dengan tabel per seri, kecuali `nilai`, `nilai_asli`,
 dibaca dari tabel per seri melalui `_baris_silver` atau `_kunci_silver`.
 Dengan demikian setiap sel terisi dapat ditelusuri ke baris Silver asalnya,
 sedangkan sel kosong tidak memiliki lineage.
+
+## data/gold/panel.parquet
+
+Panel panjang Gold tingkat provinsi x periode x indikator (1.330 baris: 1.258 terisi, 72 sel kosong berkategori).
+Panel ini mempertahankan satuan sumber per indikator (var2754 kilogram) dan
+menyediakan kolom `nilai_log`; untuk analisis yang tidak boleh mencampur satuan,
+gunakan `panel_provinsi.parquet` yang sudah diseragamkan ke persen/ton.
+
+| Kolom | Tipe | Satuan/format | Boleh kosong | Rentang atau nilai sah | Asal (berkas/aturan) | Keterangan |
+|---|---|---|---|---|---|---|
+| indikator | string | nama indikator panel | tidak | 7 indikator panel | `src/gold/panel.py` | `var1241`, `var2012`, `var2013`, `var2753 [Bongkar]`, `var2753 [Muat]`, `var2754 [Bongkar]`, `var2754 [Muat]` |
+| seri_kode | string | kode seri sumber | tidak | `var1241`, `var2012`, `var2013`, `var2753`, `var2754` | Silver `seri_kode` | Seri dasar BPS |
+| rincian | string | kategori arus / placeholder | tidak | `Tidak ada`, `Bongkar`, `Muat` | Silver `rincian` | Rincian terpilih |
+| wilayah_kode | int | kode provinsi BPS x 100 | tidak | 1100–9700 (38 provinsi) | Silver `wilayah_kode` | Susunan 38 provinsi standar 2025 |
+| nama_wilayah | string | teks baku | tidak | 38 nama provinsi | Kamus wilayah | Nama resmi provinsi |
+| periode | string | `YYYY` | tidak | 2015–2025 | Silver `periode` | Periode tahunan empat digit |
+| jenis_periode | string | — | tidak | `tahun` | Silver `jenis_periode` | Seluruh seri tahunan |
+| nilai | float | sesuai `satuan` | ya (hanya sel kosong) | ≥ 0; persen 0–100 | Silver `nilai` | Nilai asli tidak diubah; NaN bila sel kosong |
+| satuan | string | — | tidak | `persen`, `ton`, `kilogram` | Silver `satuan` | Satuan baku indikator |
+| status_sel | string | kategori status sel | tidak | `terisi`, `belum_ada`, `tidak_diterbitkan`, `batas_lama` | `src/gold/panel.py` | Transparansi kelengkapan grid |
+| penanda | string | label anomali/patahan | ya | `patahan_seri`, `patahan_wilayah`, `outlier` | Sprint 1 profil & anomali | Penanda anomali tanpa mengubah nilai |
+| nilai_log | float | logaritma natural | ya | ≥ 0 | `np.log1p(nilai)` | Transformasi ln(1 + nilai) untuk kargo besar |
+| _berkas_raw | string | path relatif `data/raw/` | ya (hanya sel terisi) | 5 berkas BPS | Silver `_berkas_raw` | Lineage berkas mentah |
+| _sha256_raw | string | hex 64 karakter | ya (hanya sel terisi) | sha256 berkas | Silver `_sha256_raw` | Lineage integritas data |
+
+Kunci unik: `indikator + wilayah_kode + periode`.
+
+## data/gold/panel_lebar.parquet
+
+Panel lebar Gold tingkat provinsi x periode (394 baris x 11 kolom). Hanya memuat baris terisi (`status_sel == 'terisi'`).
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| wilayah_kode | int | Kode provinsi BPS (1100–9700) |
+| nama_wilayah | string | Nama resmi 38 provinsi |
+| jenis_periode | string | Jenis periode (`tahun`) |
+| periode | string | Tahun observasi (`YYYY`) |
+| var1241 | float | Persentase rumah tangga hunian layak (persen) |
+| var2012 | float | Akses transportasi umum nyaman jarak 0,5 km (persen) |
+| var2013 | float | Penduduk 10+ pengguna kendaraan umum rute tetap (persen) |
+| var2753 [Bongkar] | float | Bongkar kargo moda kapal laut (ton) |
+| var2753 [Muat] | float | Muat kargo moda kapal laut (ton) |
+| var2754 [Bongkar] | float | Bongkar kargo moda pesawat terbang (kilogram) |
+| var2754 [Muat] | float | Muat kargo moda pesawat terbang (kilogram) |
+
+Kunci unik: `wilayah_kode + periode`.

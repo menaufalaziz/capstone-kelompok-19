@@ -1,7 +1,13 @@
 """Tahap 4-6 — panel Gold provinsi x periode x indikator.
 
-Panel dibentuk dari Silver untuk lima seri utama. Aturan sel mengikuti
-keputusan pembersihan yang sudah dicatat:
+Dua bentuk panel dilengkapi agar kompatibel dengan pekerjaan tim:
+
+1. ``panel.parquet`` dan ``panel_lebar.parquet`` dari ``src/gold/panel.py``:
+   panel panjang/lebar dengan status sel dan penanda anomali.
+2. ``panel_<seri>.parquet`` dan ``panel_provinsi.parquet`` dari modul ini:
+   panel per seri dengan satuan Gold yang diseragamkan dan lineage per sel.
+
+Aturan sel mengikuti keputusan pembersihan yang sudah dicatat:
 
 - K-004: grid 38 provinsi; agregat nasional 9999 tidak masuk panel provinsi.
 - K-005: sel tanpa observasi tetap NaN, bukan nol dan tanpa imputasi.
@@ -12,14 +18,14 @@ keputusan pembersihan yang sudah dicatat:
 - K-013/K-014: satuan bongkar muat di Silver adalah ton (var2753) dan
   kilogram (var2754).
 
-Seragamisasi satuan dilakukan di Gold (K-018): setiap indikator hanya
+Seragamisasi satuan dilakukan di Gold (K-024): setiap indikator hanya
 memakai satu satuan. Indikator persen memakai persen; indikator bongkar
 muat diseragamkan ke ton, sehingga var2754 dikonversi dari kilogram ke ton.
 Nilai asli tetap disimpan di kolom ``nilai_asli`` dan ``satuan_asli``.
 Transformasi log10 dari nilai ton disimpan di ``nilai_log10`` untuk
-analisis skala besar (K-019); nilai asli tidak diubah.
+analisis skala besar (K-025); nilai asli tidak diubah.
 
-Keluaran di ``data/gold/``:
+Keluaran unit-safe di ``data/gold/``:
 
 - ``panel_<seri>.parquet``: satu tabel per seri, kunci
   (kode_prov, periode, indikator).
@@ -28,7 +34,8 @@ Keluaran di ``data/gold/``:
   ``nilai_log10_ton``) agar satu kolom nilai tidak mencampur satuan.
 
 Setiap sel terisi membawa ``_baris_silver`` dan ``_kunci_silver`` sehingga
-dapat ditelusuri ke baris Silver asalnya; sel kosong tidak punya lineage.
+dapat ditelusuri ke baris Silver asalnya; sel kosong tidak punya lineage
+(K-026).
 """
 from pathlib import Path
 
@@ -36,6 +43,7 @@ import numpy as np
 import pandas as pd
 
 from src.common.skema import KUNCI
+from src.gold import panel as panel_lama
 from src.silver.katalog import ambil as ambil_katalog
 
 
@@ -345,7 +353,11 @@ def _gabung_panel(panels):
 
 
 def jalankan(silver):
-    """Terima Silver, tulis panel Gold, dan kembalikan {nama_tabel: DataFrame}."""
+    """Terima Silver, tulis seluruh panel Gold, dan kembalikan tabelnya."""
+    # Panel panjang/lebar yang sudah menjadi keluaran tim dan dipakai tes.
+    hasil = panel_lama.jalankan(silver)
+
+    # Panel per seri dengan satuan Gold seragam dan lineage per sel.
     s = _siapkan_silver(silver)
     provinsi = _provinsi(s)
 
@@ -357,15 +369,18 @@ def jalankan(silver):
 
     OUTPUT.mkdir(parents=True, exist_ok=True)
 
-    # Hapus keluaran Sprint 1 yang sudah digantikan panel bertipe satuan.
-    lama = OUTPUT / "panel_dasar.parquet"
-    if lama.exists():
-        lama.unlink()
-
     for seri, panel in panels.items():
         panel.to_parquet(OUTPUT / f"panel_{seri}.parquet", index=False)
 
     gabungan.to_parquet(OUTPUT / "panel_provinsi.parquet", index=False)
+
+    # Panel dasar dipertahankan untuk kompatibilitas audit lapis Bronze/Silver.
+    panel_dasar = silver.copy()
+    panel_dasar["kode_prov"] = panel_dasar["wilayah_kode"] // 100
+    panel_dasar["tingkat"] = panel_dasar["wilayah_kode"].map(
+        lambda kode: "nasional" if kode == 9999 else "provinsi"
+    )
+    panel_dasar.to_parquet(OUTPUT / "panel_dasar.parquet", index=False)
 
     kosong = int(
         (gabungan["nilai_persen"].isna() & gabungan["nilai_ton"].isna()).sum()
@@ -375,13 +390,14 @@ def jalankan(silver):
     )
 
     print(
-        f"Gold panel: {len(gabungan):,} baris, "
+        f"Gold panel unit-safe: {len(gabungan):,} baris, "
         f"{gabungan['seri_kode'].nunique()} seri, "
         f"{gabungan['indikator'].nunique()} indikator, "
         f"{kosong} sel kosong, {patahan} baris berpatahan"
     )
     print(f"Lokasi: {OUTPUT}")
 
-    hasil = {f"panel_{seri}": panel for seri, panel in panels.items()}
+    hasil.update({f"panel_{seri}": panel for seri, panel in panels.items()})
     hasil["panel_provinsi"] = gabungan
+    hasil["panel_dasar"] = panel_dasar
     return hasil
