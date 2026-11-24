@@ -1,21 +1,20 @@
-
-"""Tahap 8 - validasi minimum Silver dan panel Gold provinsi.
+"""Tahap 8 — validasi minimum Silver dan tabel Gold (pertemuan XIV–XV).
 
 Pemeriksaan meliputi skema, lineage MANIFEST, keunikan kunci, rentang nilai,
 konsistensi satuan, penanda patahan, grid panel Gold, pemisahan kolom nilai
-menurut satuan, dan lineage setiap sel Gold ke baris Silver asalnya.
+menurut satuan, lineage setiap sel Gold ke baris Silver asalnya, serta
+kompatibilitas panel panjang/lebar/dasar dan tabel rekonsiliasi.
 
 Laporan ditulis ke reports/validasi.md setiap kali pipeline berjalan.
 """
-
 from pathlib import Path
+import pandas as pd
 
 import numpy as np
 
 from src.common.manifest import baca as baca_manifest
 from src.common.skema import KUNCI, periksa_silver
 from src.silver.katalog import satuan as satuan_katalog
-
 
 ROOT = Path(__file__).resolve().parents[2]
 LAPORAN = ROOT / "reports" / "validasi.md"
@@ -525,20 +524,16 @@ def _periksa_kompatibilitas(gold):
 def jalankan(silver, gold):
     # Pemeriksaan skema dan lineage MANIFEST.
     salah_skema = []
-
     try:
         hasil_skema = periksa_silver(silver, baca_manifest())
-
         if hasil_skema:
             salah_skema.extend(hasil_skema)
-
     except Exception as exc:
         salah_skema.append(str(exc))
 
     # Pemeriksaan kunci unik.
     duplikat = silver.duplicated(KUNCI)
     salah_kunci = []
-
     if duplikat.any():
         salah_kunci.append(
             f"Ditemukan {int(duplikat.sum())} baris dengan kunci duplikat"
@@ -563,7 +558,6 @@ def jalankan(silver, gold):
     }
 
     semua_salah = []
-
     for nama, daftar_salah in pemeriksaan.items():
         for pesan in daftar_salah:
             semua_salah.append(f"{nama}: {pesan}")
@@ -572,6 +566,7 @@ def jalankan(silver, gold):
     baris_gold = len(panel_gold) if panel_gold is not None else 0
     panel_kompat = gold.get("panel")
     baris_kompat = len(panel_kompat) if panel_kompat is not None else 0
+    panel_dasar = gold.get("panel_dasar", pd.DataFrame())
     seri_panel = (
         panel_gold["seri_kode"].nunique()
         if panel_gold is not None and not panel_gold.empty
@@ -642,9 +637,7 @@ def jalankan(silver, gold):
     LAPORAN.write_text("\n".join(baris), encoding="utf-8")
 
     if semua_salah:
-        raise ValueError(
-            "Validasi gagal: " + "; ".join(semua_salah)
-        )
+        raise ValueError("Validasi gagal: " + "; ".join(semua_salah))
 
     print(
         f"Validasi: {len(silver)} baris Silver, "
@@ -658,4 +651,6 @@ def jalankan(silver, gold):
         "gold": baris_gold,
         "seri_panel": seri_panel,
         "baris_gold": baris_gold,
+        "gold_panel": baris_kompat,
+        "gold_dasar": len(panel_dasar),
     }

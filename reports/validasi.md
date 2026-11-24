@@ -8,6 +8,7 @@ Dihasilkan otomatis oleh `python pipeline.py` (tahap 8).
 - Seri Silver: 6
 - Wilayah Silver: 39
 - Berkas sumber Silver: 6
+- Baris Panel Gold: 1,330 (7 indikator, 38 provinsi)
 - Baris patahan metodologi: 35
 - Baris panel Gold: 1,330
 - Baris panel panjang kompatibilitas: 1,330
@@ -26,5 +27,9 @@ Dihasilkan otomatis oleh `python pipeline.py` (tahap 8).
 | Rentang persen dan berat | lolos |
 | Konsistensi satuan Silver | lolos |
 | Penanda patahan metodologi | lolos |
+<<<<<<< HEAD
 | Panel Gold provinsi dan lineage | lolos |
 | Panel Gold panjang/lebar kompatibilitas | lolos |
+=======
+| Integritas panel dan tabel dasar Gold | lolos |
+>>>>>>> origin/main

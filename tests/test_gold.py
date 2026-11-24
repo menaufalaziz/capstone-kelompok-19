@@ -137,6 +137,33 @@ class TestGoldPanel(unittest.TestCase):
         self.assertTrue(gold_logs["dampak_baris"].astype(str).str.contains("37").any(),
                         "Pencatatan 37 baris Silver tidak terpilih harus ada di log")
 
+    def test_tabel_rekonsiliasi(self):
+        """Tabel rekonsiliasi memuat 28 baris dengan kolom baku dan kategori penjelasan sah."""
+        rekon_file = GOLD_DIR / "rekonsiliasi.parquet"
+        csv_file = ROOT / "reports" / "tabel_rekonsiliasi.csv"
+        self.assertTrue(rekon_file.exists(), "Berkas data/gold/rekonsiliasi.parquet harus ada")
+        self.assertTrue(csv_file.exists(), "Berkas reports/tabel_rekonsiliasi.csv harus ada")
+
+        df = pd.read_parquet(rekon_file)
+        self.assertEqual(len(df), 28, "Tabel rekonsiliasi harus memuat tepat 28 baris")
+
+        kolom_wajib = {"pasangan", "periode", "nilai_utama", "satuan_utama",
+                       "nilai_pembanding", "satuan_pembanding", "selisih",
+                       "persen_selisih", "kategori", "penjelasan"}
+        self.assertEqual(set(df.columns), kolom_wajib)
+
+        kategori_sah = {"Definisi berbeda", "Metode berbeda", "Cakupan berbeda", "Vintage berbeda", "Belum terjelaskan"}
+        self.assertTrue(set(df["kategori"].unique()).issubset(kategori_sah))
+
+        # Pasangan var1241 vs WDI memuat 4 baris irisan
+        wdi_pair = df[df["pasangan"].str.contains("WDI")]
+        self.assertEqual(len(wdi_pair), 4)
+        self.assertEqual(set(wdi_pair["periode"].tolist()), {"2016", "2018", "2020", "2022"})
+
+        # Log K-024 tercatat
+        log_df = pd.read_csv(ROOT / "log-keputusan.csv")
+        self.assertTrue((log_df["id"] == "K-024").any(), "Log keputusan K-024 harus tercatat")
+
 
 if __name__ == "__main__":
     unittest.main()

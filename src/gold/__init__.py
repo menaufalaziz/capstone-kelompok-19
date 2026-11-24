@@ -1,4 +1,4 @@
-"""Tahap 4-6 — panel Gold provinsi x periode x indikator.
+"""Tahap 4–6 — fondasi Gold dan Rekonsiliasi.
 
 Dua bentuk panel dilengkapi agar kompatibel dengan pekerjaan tim:
 
@@ -36,6 +36,14 @@ Keluaran unit-safe di ``data/gold/``:
 Setiap sel terisi membawa ``_baris_silver`` dan ``_kunci_silver`` sehingga
 dapat ditelusuri ke baris Silver asalnya; sel kosong tidak punya lineage
 (K-026).
+
+Keluaran kompatibilitas tim:
+- data/gold/panel.parquet (panjang, 1.330 baris)
+- data/gold/panel_lebar.parquet (lebar, 394 baris x 11 kolom)
+- data/gold/panel_dasar.parquet (dasar, 1.295 baris untuk kompatibilitas)
+- data/gold/rekonsiliasi.parquet (tabel rekonsiliasi integrasi, 28 baris)
+- reports/panel-gold.md
+- reports/tabel_rekonsiliasi.csv
 """
 from pathlib import Path
 
@@ -44,8 +52,8 @@ import pandas as pd
 
 from src.common.skema import KUNCI
 from src.gold import panel as panel_lama
+from src.gold import rekonsiliasi
 from src.silver.katalog import ambil as ambil_katalog
-
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "data" / "gold"
@@ -353,7 +361,7 @@ def _gabung_panel(panels):
 
 
 def jalankan(silver):
-    """Terima Silver, tulis seluruh panel Gold, dan kembalikan tabelnya."""
+    """Jalankan pembentukan panel Gold, panel unit-safe, dan rekonsiliasi."""
     # Panel panjang/lebar yang sudah menjadi keluaran tim dan dipakai tes.
     hasil = panel_lama.jalankan(silver)
 
@@ -397,7 +405,12 @@ def jalankan(silver):
     )
     print(f"Lokasi: {OUTPUT}")
 
-    hasil.update({f"panel_{seri}": panel for seri, panel in panels.items()})
+    hasil.update({f"panel_{seri}": isi for seri, isi in panels.items()})
     hasil["panel_provinsi"] = gabungan
     hasil["panel_dasar"] = panel_dasar
+
+    # Tahap 6: Bangun tabel rekonsiliasi.
+    df_rekon = rekonsiliasi.jalankan(silver, hasil.get("panel"))
+    hasil["rekonsiliasi"] = df_rekon
+
     return hasil
