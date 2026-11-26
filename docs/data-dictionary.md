@@ -19,7 +19,7 @@ Hasil audit terhadap judul tabel dan metadata berkas mentah. Sumber kebenaran ko
 | `EN.POP.SLUM.UR.ZS` | wdi | Population living in slums (% of urban population) | — | persen | 11.1.1 | judul "% of urban population", `unit` kosong, nilai 19,41–35,13; `sourceNote` WDI menyebut Sustainable Development Goal 11.1.1 |
 
 Koreksi satuan hanya mengubah label, bukan nilai mentah. Konversi satuan dilakukan di Gold
-(K-024: var2754 kilogram menjadi ton) dengan nilai asli tetap disimpan. `src/silver/bangun.py`
+(K-025: var2754 kilogram menjadi ton) dengan nilai asli tetap disimpan. `src/silver/bangun.py`
 mengambil `satuan` dari katalog ini, bukan dari kolom mentah.
 Semua seri tahunan; Silver tidak merata-ratakan periode semester/bulan ke tahunan.
 Keputusan K-007 (placeholder satuan 2012/2013) dan label KG pada K-003 disempurnakan oleh K-011,
@@ -76,11 +76,11 @@ Untuk var2753 dan var2754, Bongkar dan Muat menjadi indikator terpisah.
 | tingkat | string | — | tidak | `provinsi` | aturan Gold | agregat nasional tidak ada di tabel ini |
 | sumber | string | — | tidak | `bps` | Silver | |
 | seri_kode | string | kode seri sumber | tidak | `var1241` s.d. `var2754` | Silver | |
-| satuan | string | satuan Gold | tidak | `persen`, `ton` | K-024 | satu satuan per tabel |
+| satuan | string | satuan Gold | tidak | `persen`, `ton` | K-025 | satu satuan per tabel |
 | satuan_asli | string | satuan Silver | tidak | `persen`, `ton`, `kilogram` | Silver | var2754 = kilogram |
-| nilai | float | sesuai `satuan` | ya | persen 0–100; ton ≥ 0 | Silver + K-024 | nilai setelah konversi satuan |
+| nilai | float | sesuai `satuan` | ya | persen 0–100; ton ≥ 0 | Silver + K-025 | nilai setelah konversi satuan |
 | nilai_asli | float | sesuai `satuan_asli` | ya | ≥ 0 | Silver | nilai sebelum konversi |
-| nilai_log10 | float | log10(nilai ton) | ya | hingga | K-025 | hanya terisi untuk indikator ton |
+| nilai_log10 | float | log10(nilai ton) | ya | hingga | K-026 | hanya terisi untuk indikator ton |
 | penanda_patahan | string | label keputusan | tidak | `""`, `patahan_metodologi` | K-010 | seluruh grid var1241 2019 |
 | _berkas_raw | string | path relatif `data/raw/` | ya | 5 berkas BPS | Silver | kosong pada sel grid |
 | _sha256_raw | string | hex 64 karakter | ya | sha256 berkas | Silver | kosong pada sel grid |

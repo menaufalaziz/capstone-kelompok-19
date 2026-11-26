@@ -18,12 +18,12 @@ Aturan sel mengikuti keputusan pembersihan yang sudah dicatat:
 - K-013/K-014: satuan bongkar muat di Silver adalah ton (var2753) dan
   kilogram (var2754).
 
-Seragamisasi satuan dilakukan di Gold (K-024): setiap indikator hanya
+Seragamisasi satuan dilakukan di Gold (K-025): setiap indikator hanya
 memakai satu satuan. Indikator persen memakai persen; indikator bongkar
 muat diseragamkan ke ton, sehingga var2754 dikonversi dari kilogram ke ton.
 Nilai asli tetap disimpan di kolom ``nilai_asli`` dan ``satuan_asli``.
 Transformasi log10 dari nilai ton disimpan di ``nilai_log10`` untuk
-analisis skala besar (K-025); nilai asli tidak diubah.
+analisis skala besar (K-026); nilai asli tidak diubah.
 
 Keluaran unit-safe di ``data/gold/``:
 
@@ -35,7 +35,7 @@ Keluaran unit-safe di ``data/gold/``:
 
 Setiap sel terisi membawa ``_baris_silver`` dan ``_kunci_silver`` sehingga
 dapat ditelusuri ke baris Silver asalnya; sel kosong tidak punya lineage
-(K-026).
+(K-027).
 
 Keluaran kompatibilitas tim:
 - data/gold/panel.parquet (panjang, 1.330 baris)
