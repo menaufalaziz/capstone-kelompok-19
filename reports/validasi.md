@@ -28,3 +28,4 @@ Dihasilkan otomatis oleh `python pipeline.py` (tahap 8).
 | Penanda patahan metodologi | lolos |
 | Panel Gold provinsi dan lineage | lolos |
 | Panel Gold panjang/lebar kompatibilitas | lolos |
+| Kategori pasangan rekonsiliasi | lolos |

@@ -521,6 +521,41 @@ def _periksa_kompatibilitas(gold):
     return salah
 
 
+def _periksa_rekonsiliasi(gold):
+    """Setiap pasangan rekonsiliasi wajib punya kategori penjelasan yang sah."""
+    salah = []
+
+    rekon = gold.get("rekonsiliasi")
+    if rekon is None or rekon.empty:
+        return ["tabel rekonsiliasi tidak ditemukan atau kosong"]
+
+    if not {"pasangan", "kategori"}.issubset(rekon.columns):
+        return ["kolom pasangan atau kategori tidak ditemukan"]
+
+    berpasangan = (
+        rekon["pasangan"].notna()
+        & rekon["pasangan"].astype(str).str.strip().ne("")
+    )
+    kategori = rekon["kategori"].astype("string").str.strip()
+    kosong = berpasangan & (kategori.isna() | kategori.eq(""))
+    if kosong.any():
+        salah.append(f"{int(kosong.sum())} pasangan tanpa kategori")
+
+    kategori_sah = {
+        "Definisi berbeda",
+        "Metode berbeda",
+        "Cakupan berbeda",
+        "Vintage berbeda",
+        "Belum terjelaskan",
+    }
+    asing = berpasangan & kategori.notna() & kategori.ne("") & ~kategori.isin(kategori_sah)
+    if asing.any():
+        nilai = sorted(set(kategori[asing].dropna()))
+        salah.append(f"{int(asing.sum())} kategori di luar daftar baku: {nilai}")
+
+    return salah
+
+
 def jalankan(silver, gold):
     # Pemeriksaan skema dan lineage MANIFEST.
     salah_skema = []
@@ -545,6 +580,7 @@ def jalankan(silver, gold):
     salah_patahan = _periksa_patahan(silver)
     salah_gold = _periksa_gold(gold, silver)
     salah_kompatibilitas = _periksa_kompatibilitas(gold)
+    salah_rekonsiliasi = _periksa_rekonsiliasi(gold)
 
     # Mengumpulkan seluruh pelanggaran.
     pemeriksaan = {
@@ -555,6 +591,7 @@ def jalankan(silver, gold):
         "Penanda patahan metodologi": salah_patahan,
         "Panel Gold provinsi dan lineage": salah_gold,
         "Panel Gold panjang/lebar kompatibilitas": salah_kompatibilitas,
+        "Kategori pasangan rekonsiliasi": salah_rekonsiliasi,
     }
 
     semua_salah = []
