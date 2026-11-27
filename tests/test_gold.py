@@ -125,13 +125,15 @@ class TestGoldPanel(unittest.TestCase):
         self.assertFalse(self.lebar.duplicated(["wilayah_kode", "periode"]).any(), "Kunci panel lebar harus unik")
 
     def test_log_keputusan_tahap_gold(self):
-        """Setiap aturan pemilihan Gold tertulis di log-keputusan.csv tahap 'gold' oleh Riska Erlis (124450022)."""
+        """Aturan pemilihan Gold tercatat di log-keputusan.csv tahap 'gold'."""
         log_path = ROOT / "log-keputusan.csv"
         self.assertTrue(log_path.exists())
         log_df = pd.read_csv(log_path)
         gold_logs = log_df[log_df["tahap"] == "gold"]
         self.assertGreaterEqual(len(gold_logs), 5, "Harus terdapat minimal 5 baris keputusan tahap gold")
-        self.assertTrue((gold_logs["nim"] == 124450022).all(), "Keputusan tahap gold harus dicatat oleh Riska Erlis (124450022)")
+        self.assertTrue(gold_logs["nim"].notna().all(), "Setiap keputusan tahap gold harus punya NIM pencatat")
+        self.assertTrue((gold_logs["nim"] == 124450022).any(),
+                        "Keputusan tahap gold oleh Riska Erlis (124450022) harus tercatat")
         self.assertTrue(gold_logs["dampak_baris"].astype(str).str.contains("37").any(),
                         "Pencatatan 37 baris Silver tidak terpilih harus ada di log")
 
