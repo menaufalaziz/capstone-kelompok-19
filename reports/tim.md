@@ -38,92 +38,133 @@ Rata-rata sederhana antarprovinsi turun dari 93,90% pada 2018 menjadi 54,14% pad
 Penurunan yang terjadi secara serentak di seluruh provinsi, disertai keterangan kriteria pengukuran sejak 2019, menjadi bukti pendukung bahwa perubahan tersebut lebih tepat dikategorikan sebagai patahan seri daripada galat input. Nilai asli tetap dipertahankan dan tidak dilakukan koreksi.
 
 Data perbandingan setiap provinsi tersedia pada `reports/perbandingan_var1241_2018_2019.csv`, sedangkan keputusan penanganannya tercatat pada K-010 di `log-keputusan.csv`.
+
 ## Integrasi dan rekonsiliasi
 
-Tahap integrasi dan rekonsiliasi (Tahap 6) bertujuan untuk memverifikasi konsistensi eksternal seri utama terhadap standar pembanding internasional (World Development Indicators - Bank Dunia/UN-Habitat) serta menguji konsistensi internal antara agregat provinsi dan angka nasional BPS. Seluruh angka pada bagian ini tersimpan di `data/gold/rekonsiliasi.parquet` dan `reports/tabel_rekonsiliasi.csv`, serta diturunkan langsung dari `data/gold/` dan `log-keputusan.csv`.
+Tahap integrasi dan rekonsiliasi (Tahap 6) bertujuan untuk memeriksa konsistensi eksternal antara seri utama BPS dan data pembanding internasional World Development Indicators (WDI), serta konsistensi internal antara agregat provinsi dan angka nasional BPS. Perbandingan dilakukan dengan mempertahankan nilai asli dari masing-masing sumber. Perbedaan nilai tidak dihapus atau dipaksakan menjadi sama, tetapi dianalisis berdasarkan definisi, metode, dan cakupan data.
 
-Sesuai ketentuan Capstone, selisih antarseri tidak dihapus dan tidak dipaksa sama, melainkan diklasifikasikan ke dalam kategori penjelasan: **Definisi berbeda**, **Metode berbeda**, **Cakupan berbeda**, atau **Vintage berbeda**.
+Hasil rekonsiliasi disimpan dalam `data/gold/rekonsiliasi.parquet` dan `reports/tabel_rekonsiliasi.csv`. Tabel CSV memuat 28 baris hasil perbandingan yang terdiri atas 4 baris kategori Definisi berbeda, 14 baris Metode berbeda, dan 10 baris Cakupan berbeda. Pemeriksaan perbedaan vintage atau waktu rilis data dibahas secara terpisah karena tidak menjadi kategori pada 28 baris tabel tersebut.
 
-### 1. Tabel Rekonsiliasi Komprehensif
+### 1. Tabel Rekonsiliasi
 
-Tabel berikut merangkum hasil rekonsiliasi untuk seluruh 28 observasi yang dievaluasi pada Sprint 2:
+Tabel berikut menyajikan pasangan data, periode, nilai utama, nilai pembanding, selisih nominal, persentase selisih, serta kategori penjelasan. Persentase selisih merupakan perbandingan aritmetis terhadap nilai pembanding. Khusus pasangan dengan definisi indikator berbeda, angka persentase hanya menunjukkan besarnya perbedaan secara numerik dan tidak dapat ditafsirkan sebagai ukuran kesenjangan substantif yang setara.
 
-| Pasangan yang Dibandingkan | Periode | Nilai Seri Utama | Satuan Utama | Nilai Pembanding | Satuan Pembanding | Selisih Nominal | Rasio / Deviasi | Kategori Penjelasan |
+| Pasangan yang Dibandingkan | Periode | Nilai Seri Utama | Satuan Utama | Nilai Pembanding | Satuan Pembanding | Selisih Nominal | Persentase Selisih | Kategori |
 |---|:---:|---:|:---:|---:|:---:|---:|---:|---|
-| **var1241 vs WDI EN.POP.SLUM.UR.ZS** | 2016 | 94,00 | % | 21,89 | % | +72,11 | BPS ↑, WDI ↓ | Definisi berbeda |
-| **var1241 vs WDI EN.POP.SLUM.UR.ZS** | 2018 | 95,70 | % | 20,24 | % | +75,46 | BPS ↑, WDI ↓ | Definisi berbeda |
-| **var1241 vs WDI EN.POP.SLUM.UR.ZS** | 2020 | 59,54 | % | 19,41 | % | +40,13 | Patahan BPS | Definisi berbeda |
-| **var1241 vs WDI EN.POP.SLUM.UR.ZS** | 2022 | 60,66 | % | 19,41 | % | +41,25 | BPS ↑, WDI ↔ | Definisi berbeda |
-| **var2754 Bongkar (Provinsi vs Nas)** | 2021 | 622.546.815 | kg | 622.000.000 | kg | +546.815 | +0,09% | Metode berbeda (Pembulatan) |
-| **var2754 Bongkar (Provinsi vs Nas)** | 2022 | 577.765.577 | kg | 577.000.000 | kg | +765.577 | +0,13% | Metode berbeda (Pembulatan) |
-| **var2754 Bongkar (Provinsi vs Nas)** | 2023 | 580.939.961 | kg | 580.939.961 | kg | 0 | 0,00% (Eksak) | Metode berbeda (Sesuai) |
-| **var2754 Bongkar (Provinsi vs Nas)** | 2024 | 689.283.176 | kg | 689.000.000 | kg | +283.176 | +0,04% | Metode berbeda (Pembulatan) |
-| **var2754 Bongkar (Provinsi vs Nas)** | 2025 | 674.547.332 | kg | 675.000.000 | kg | -452.668 | -0,07% | Metode berbeda (Pembulatan) |
-| **var2754 Muat (Provinsi vs Nas)** | 2021 | 602.068.213 | kg | 602.000.000 | kg | +68.213 | +0,01% | Metode berbeda (Pembulatan) |
-| **var2754 Muat (Provinsi vs Nas)** | 2022 | 642.439.246 | kg | 643.000.000 | kg | -560.754 | -0,09% | Metode berbeda (Pembulatan) |
-| **var2754 Muat (Provinsi vs Nas)** | 2023 | 601.762.588 | kg | 601.762.588 | kg | 0 | 0,00% (Eksak) | Metode berbeda (Sesuai) |
-| **var2754 Muat (Provinsi vs Nas)** | 2024 | 674.735.003 | kg | 675.000.000 | kg | -264.997 | -0,04% | Metode berbeda (Pembulatan) |
-| **var2754 Muat (Provinsi vs Nas)** | 2025 | 670.710.328 | kg | 671.000.000 | kg | -289.672 | -0,04% | Metode berbeda (Pembulatan) |
-| **var2012 Moda Transportasi (Rerata)** | 2017 | 57,98 | % | 54,67 | % | +3,31 | +6,05% | Metode berbeda (Pembobotan) |
-| **var2012 Moda Transportasi (Rerata)** | 2020 | 59,24 | % | 56,01 | % | +3,23 | +5,76% | Metode berbeda (Pembobotan) |
-| **var2013 Kemacetan/Angkutan (Rerata)** | 2017 | 4,00 | % | 4,85 | % | -0,85 | -17,55% | Metode berbeda (Pembobotan) |
-| **var2013 Kemacetan/Angkutan (Rerata)** | 2020 | 5,05 | % | 5,74 | % | -0,69 | -12,09% | Metode berbeda (Pembobotan) |
-| **var2753 Bongkar (Agregat 36 Prov)** | 2021 | 399.325.458 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
-| **var2753 Bongkar (Agregat 36 Prov)** | 2022 | 392.927.647 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
-| **var2753 Bongkar (Agregat 36 Prov)** | 2023 | 358.100.371 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
-| **var2753 Bongkar (Agregat 36 Prov)** | 2024 | 396.389.965 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
-| **var2753 Bongkar (Agregat 36 Prov)** | 2025 | 451.664.125 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
-| **var2753 Muat (Agregat 36 Prov)** | 2021 | 384.784.258 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
-| **var2753 Muat (Agregat 36 Prov)** | 2022 | 398.095.203 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
-| **var2753 Muat (Agregat 36 Prov)** | 2023 | 385.612.407 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
-| **var2753 Muat (Agregat 36 Prov)** | 2024 | 433.733.968 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
-| **var2753 Muat (Agregat 36 Prov)** | 2025 | 508.550.340 | ton | *Tidak terbit* | ton | N/A | N/A | Cakupan berbeda (Tanpa Nas) |
+| **var1241 (BPS Nasional) vs WDI EN.POP.SLUM.UR.ZS** | 2016 | 94,00 | % | 21,89 | % | +72,11 | +329,38% | Definisi berbeda |
+| **var1241 (BPS Nasional) vs WDI EN.POP.SLUM.UR.ZS** | 2018 | 95,70 | % | 20,24 | % | +75,46 | +372,87% | Definisi berbeda |
+| **var1241 (BPS Nasional) vs WDI EN.POP.SLUM.UR.ZS** | 2020 | 59,54 | % | 19,41 | % | +40,13 | +206,74% | Definisi berbeda |
+| **var1241 (BPS Nasional) vs WDI EN.POP.SLUM.UR.ZS** | 2022 | 60,66 | % | 19,41 | % | +41,25 | +212,51% | Definisi berbeda |
+| **var2754 Bongkar (Jumlah Provinsi vs BPS Nasional)** | 2021 | 622.546.815 | kg | 622.000.000 | kg | +546.815 | +0,09% | Metode berbeda |
+| **var2754 Bongkar (Jumlah Provinsi vs BPS Nasional)** | 2022 | 577.765.577 | kg | 577.000.000 | kg | +765.577 | +0,13% | Metode berbeda |
+| **var2754 Bongkar (Jumlah Provinsi vs BPS Nasional)** | 2023 | 580.939.961 | kg | 580.939.961 | kg | 0 | 0,00% | Metode berbeda |
+| **var2754 Bongkar (Jumlah Provinsi vs BPS Nasional)** | 2024 | 689.283.176 | kg | 689.000.000 | kg | +283.176 | +0,04% | Metode berbeda |
+| **var2754 Bongkar (Jumlah Provinsi vs BPS Nasional)** | 2025 | 674.547.332 | kg | 675.000.000 | kg | -452.668 | -0,07% | Metode berbeda |
+| **var2754 Muat (Jumlah Provinsi vs BPS Nasional)** | 2021 | 602.068.213 | kg | 602.000.000 | kg | +68.213 | +0,01% | Metode berbeda |
+| **var2754 Muat (Jumlah Provinsi vs BPS Nasional)** | 2022 | 642.439.246 | kg | 643.000.000 | kg | -560.754 | -0,09% | Metode berbeda |
+| **var2754 Muat (Jumlah Provinsi vs BPS Nasional)** | 2023 | 601.762.588 | kg | 601.762.588 | kg | 0 | 0,00% | Metode berbeda |
+| **var2754 Muat (Jumlah Provinsi vs BPS Nasional)** | 2024 | 674.735.003 | kg | 675.000.000 | kg | -264.997 | -0,04% | Metode berbeda |
+| **var2754 Muat (Jumlah Provinsi vs BPS Nasional)** | 2025 | 670.710.328 | kg | 671.000.000 | kg | -289.672 | -0,04% | Metode berbeda |
+| **var2012 Moda Transportasi (Rerata Provinsi vs BPS Nasional)** | 2017 | 57,98 | % | 54,67 | % | +3,31 | +6,05% | Metode berbeda |
+| **var2012 Moda Transportasi (Rerata Provinsi vs BPS Nasional)** | 2020 | 59,24 | % | 56,01 | % | +3,23 | +5,76% | Metode berbeda |
+| **var2013 Kemacetan/Angkutan (Rerata Provinsi vs BPS Nasional)** | 2017 | 4,00 | % | 4,85 | % | -0,85 | -17,55% | Metode berbeda |
+| **var2013 Kemacetan/Angkutan (Rerata Provinsi vs BPS Nasional)** | 2020 | 5,05 | % | 5,74 | % | -0,69 | -12,09% | Metode berbeda |
+| **var2753 Bongkar (Agregat 36 Provinsi)** | 2021 | 399.325.458 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
+| **var2753 Bongkar (Agregat 36 Provinsi)** | 2022 | 392.927.647 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
+| **var2753 Bongkar (Agregat 36 Provinsi)** | 2023 | 358.100.371 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
+| **var2753 Bongkar (Agregat 36 Provinsi)** | 2024 | 396.389.965 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
+| **var2753 Bongkar (Agregat 36 Provinsi)** | 2025 | 451.664.125 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
+| **var2753 Muat (Agregat 36 Provinsi)** | 2021 | 384.784.258 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
+| **var2753 Muat (Agregat 36 Provinsi)** | 2022 | 398.095.203 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
+| **var2753 Muat (Agregat 36 Provinsi)** | 2023 | 385.612.407 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
+| **var2753 Muat (Agregat 36 Provinsi)** | 2024 | 433.733.968 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
+| **var2753 Muat (Agregat 36 Provinsi)** | 2025 | 508.550.340 | ton | Tidak tersedia | ton | N/A | N/A | Cakupan berbeda |
 
-### 2. Analisis Mendalam Penjelasan Setiap Kategori
+### 2. Analisis dan Penjelasan Setiap Kategori
 
-#### A. Kategori Definisi Berbeda: var1241 (BPS) vs WDI EN.POP.SLUM.UR.ZS
-Pasangan ini membandingkan indikator perumahan nasional BPS dengan pembanding internasional World Bank/UN-Habitat pada 4 tahun irisan (2016, 2018, 2020, 2022):
-- **Perbedaan Konsep dan Arah**:
-  - BPS `var1241` mengukur **persentase rumah tangga** yang memiliki akses terhadap **hunian layak** (makin tinggi angka, kondisi makin baik).
-  - WDI `EN.POP.SLUM.UR.ZS` mengukur proporsi **penduduk perkotaan** (*urban population*) yang bertempat tinggal di **kawasan kumuh** (*slum households*) (makin tinggi angka, kondisi makin buruk).
-  - Karena konsepnya berlawanan arah, perbandingan tidak boleh dilihat dari selisih langsung, melainkan dari **arah perubahan (*trend concordance*)**:
-    - Periode 2016 ke 2018: Nilai BPS naik dari 94,00% menjadi 95,70% (+1,70 pp). Secara selaras, estimasi kawasan kumuh perkotaan WDI turun dari 21,89% menjadi 20,24% (-1,65 pp). Keduanya secara konsisten mengindikasikan perbaikan kualitas hunian.
-    - Periode 2018 ke 2020: BPS mengalami patahan metodologis drastis (turun dari 95,70% ke 59,54% atau -36,16 pp) akibat adopsi standar 4 kriteria SDG 11.1.1 (ketahanan bangunan, luas lantai, air layak, sanitasi layak; tercatat pada K-010). Sebaliknya, WDI tidak mengadopsi diskontinuitas tersebut dan hanya turun tipis dari 20,24% ke 19,41% (-0,83 pp).
-    - Periode 2020 ke 2022: Pasca-patahan, tren perbaikan BPS berlanjut naik menjadi 60,66% (+1,12 pp), sementara angka WDI stagnan di 19,41% karena ketiadaan data survei baru UN-Habitat pada rilis arsip tersebut.
-- **Kesimpulan**: Selisih nominal (40–75 poin persentase) sepenuhnya disebabkan oleh perbedaan unit observasi (rumah tangga nasional vs penduduk perkotaan), perbedaan dimensi yang diukur (layak huni vs kumuh), dan dampak patahan seri BPS tahun 2019.
+#### A. Definisi Berbeda: var1241 (BPS) vs WDI EN.POP.SLUM.UR.ZS
 
-#### B. Kategori Metode Berbeda: Kargo Udara var2754 & Transportasi Darat var2012/var2013
-1. **Kargo Pesawat Terbang (var2754 Bongkar & Muat)**:
-   - Evaluasi membandingkan hasil penjumlahan 34/38 provinsi terhadap baris ringkasan nasional BPS (kode wilayah 9999 / INDONESIA).
-   - Pada tahun **2023**, hasil penjumlahan provinsi cocok sempurna dengan baris INDONESIA BPS dengan **selisih 0 kg** (Bongkar: 580.939.961 kg; Muat: 601.762.588 kg; rasio tepat 100,000%).
-   - Pada tahun **2021, 2022, 2024, dan 2025**, ditemukan selisih sangat kecil antara -0,09% hingga +0,13% (maksimum selisih 765.577 kg pada volume 577 juta kg).
-   - **Penyebab**: Angka ringkasan nasional BPS pada tahun-tahun tersebut dibulatkan ke jutaan kg terdekat (tiga nol di belakang, misalnya 622.000.000 kg), sedangkan agregasi provinsi mempertahankan nilai presisi riil dari bandara-bandara daerah.
-2. **Transportasi Darat (var2012 Moda Transportasi & var2013 Kemacetan/Angkutan)**:
-   - Rata-rata sederhana (*unweighted mean*) 34 provinsi menghasilkan selisih sistematis terhadap baris INDONESIA BPS (+3,2 s.d. +3,3 pp pada var2012; -0,7 s.d. -0,85 pp pada var2013).
-   - **Penyebab**: Baris nasional BPS dihitung menggunakan agregasi terbobot populasi (*weighted national pooling* berdasarkan jumlah rumah tangga Susenas tiap provinsi), sedangkan rata-rata unweighted memperlakukan provinsi berpenduduk besar (seperti Jawa Barat) setara dengan provinsi berpenduduk kecil.
+Pasangan ini membandingkan indikator hunian layak BPS dengan indikator kawasan kumuh perkotaan dari WDI pada empat tahun irisan, yaitu 2016, 2018, 2020, dan 2022.
 
-#### C. Kategori Cakupan Berbeda: Kargo Pelabuhan Laut var2753
-- Seri kargo pelabuhan laut (var2753 Bongkar & Muat) **tidak memiliki baris ringkasan nasional (INDONESIA)** pada berkas sumber BPS (0 baris nasional di Silver).
-- **Penyebab**: Publikasi BPS hanya mencakup 36 provinsi pesisir yang memiliki pelabuhan laut komersial aktif. DI Yogyakarta dan Papua Pegunungan tidak memiliki pelabuhan laut komersial yang dicatat, sehingga BPS tidak menyertakan baris agregasi nasional 9999 untuk seri ini.
-- Agregat nasional dihitung langsung dari panel provinsi Gold: volume bongkar berkisar antara 358,10 juta ton (2023) hingga 451,66 juta ton (2025), sedangkan muat berkisar antara 384,78 juta ton (2021) hingga 508,55 juta ton (2025).
+- BPS `var1241` mengukur persentase rumah tangga yang memiliki akses terhadap hunian layak. Nilai yang lebih tinggi menunjukkan proporsi rumah tangga dengan hunian layak yang lebih besar.
+- WDI `EN.POP.SLUM.UR.ZS` mengukur persentase penduduk perkotaan yang tinggal di kawasan kumuh. Nilai yang lebih tinggi menunjukkan proporsi penduduk perkotaan yang tinggal di kawasan kumuh lebih besar.
+- Kedua indikator memiliki konsep, unit observasi, dan arah interpretasi yang berbeda. Oleh karena itu, selisih nominal maupun persentase selisih pada tabel tidak dapat dianggap sebagai perbandingan langsung atas ukuran kondisi yang sama.
 
-#### D. Kategori Vintage Berbeda & Analisis Rilis Arsip WDI
-- Data WDI `EN.POP.SLUM.UR.ZS` pada repositori bersumber dari arsip snapshot per 8 Oktober 2026, sedangkan data BPS bersumber dari snapshot 20 Oktober 2026.
-- Penelusuran arsip menunjukkan seri WDI ini diperbarui secara berkala dua tahunan (2000–2022) dengan frekuensi pemutakhiran rendah (*rarely updated series*). Tidak ditemukan revisi angka masa lampau pada rilis 2026 dibandingkan rilis sebelumnya, menegaskan stabilitas seri pembanding WDI untuk keperluan rekonsiliasi.
+Berdasarkan perubahan antarperiode:
+
+- **2016–2018:** Nilai BPS naik dari 94,00% menjadi 95,70%, atau meningkat 1,70 poin persentase. Pada periode yang sama, nilai WDI turun dari 21,89% menjadi 20,24%, atau turun 1,65 poin persentase. Arah perubahan kedua indikator tersebut sejalan dengan indikasi perbaikan kondisi hunian.
+- **2018–2020:** Nilai BPS turun dari 95,70% menjadi 59,54%, sedangkan WDI turun dari 20,24% menjadi 19,41%. Penurunan BPS perlu dibaca dengan mempertimbangkan patahan seri metodologi var1241 yang didokumentasikan pada keputusan K-010. Sejak 2019, pengukuran hunian layak menggunakan empat kriteria, yaitu kecukupan luas tempat tinggal, akses air minum layak, akses sanitasi layak, dan ketahanan bangunan.
+- **2020–2022:** Nilai BPS naik dari 59,54% menjadi 60,66%, sedangkan nilai WDI tetap sebesar 19,41% pada data yang digunakan.
+
+Dengan demikian, perbedaan nilai BPS dan WDI terutama perlu dijelaskan melalui perbedaan definisi, unit observasi, dan patahan seri BPS. Selisih numerik pada tabel tidak boleh ditafsirkan sebagai besarnya perbedaan kondisi hunian secara langsung.
+
+#### B. Metode Berbeda: var2754, var2012, dan var2013
+
+**1. Kargo udara var2754 (Bongkar dan Muat)**
+
+Rekonsiliasi var2754 membandingkan penjumlahan nilai provinsi dengan nilai nasional BPS pada periode 2021–2025.
+
+- Pada 2023, hasil penjumlahan provinsi sama dengan angka nasional BPS. Selisih untuk Bongkar dan Muat masing-masing sebesar 0 kg.
+- Pada 2021, 2022, 2024, dan 2025 terdapat selisih antara agregat provinsi dan angka nasional BPS. Selisih relatifnya berkisar antara -0,07% hingga +0,13%.
+- Selisih tersebut relatif kecil dibandingkan nilai total kargo yang mencapai ratusan juta kilogram.
+- Salah satu kemungkinan penjelasan adalah pembulatan pada angka nasional dalam berkas sumber, sedangkan agregat provinsi dihitung dari penjumlahan nilai provinsi. Namun, pembulatan sebagai penyebab selisih masih merupakan dugaan dan tidak dinyatakan sebagai kepastian tanpa dokumentasi metode sumber.
+
+**2. Indikator var2012 dan var2013**
+
+Pada var2012 dan var2013, nilai pembanding dihitung dari rata-rata sederhana (*unweighted mean*) antarprovinsi, kemudian dibandingkan dengan angka nasional BPS.
+
+- Pada var2012, rata-rata provinsi lebih tinggi daripada angka nasional BPS. Selisihnya sebesar 3,31 poin persentase pada 2017 dan 3,23 poin persentase pada 2020.
+- Pada var2013, rata-rata provinsi lebih rendah daripada angka nasional BPS. Selisihnya sebesar -0,85 poin persentase pada 2017 dan -0,69 poin persentase pada 2020.
+- Rata-rata sederhana memberikan bobot yang sama kepada setiap provinsi, sedangkan angka nasional BPS berasal dari metode agregasi nasional. Perbedaan pendekatan agregasi tersebut dapat menghasilkan nilai yang berbeda.
+- Dasar pembobotan atau rincian metode agregasi nasional tidak disimpulkan lebih jauh tanpa dokumentasi sumber yang mendukung.
+
+#### C. Cakupan Berbeda: Kargo laut var2753
+
+Seri kargo laut var2753 (Bongkar dan Muat) memiliki data dari 36 provinsi pada periode 2021–2025. Berkas sumber BPS yang digunakan tidak menyediakan baris ringkasan nasional `INDONESIA` untuk seri ini.
+
+Oleh karena itu:
+
+- Nilai agregat provinsi dihitung dengan menjumlahkan data dari 36 provinsi yang tersedia.
+- Tidak terdapat nilai nasional BPS yang dapat digunakan sebagai pembanding langsung.
+- Selisih nominal dan persentase selisih tidak dapat dihitung karena nilai pembanding nasional tidak tersedia.
+- Panel Bongkar dan Muat tetap dipisahkan sesuai perbedaan cakupan data dan keputusan K-006.
+
+Hasil agregat tersebut merupakan penjumlahan provinsi yang memiliki data, bukan angka nasional resmi yang diterbitkan BPS. Karena itu, interpretasinya harus mempertimbangkan cakupan wilayah yang tersedia.
+
+#### D. Pemeriksaan Vintage atau Perbedaan Waktu Rilis Data
+
+Selain tiga kategori yang muncul dalam tabel, pemeriksaan juga memperhatikan perbedaan waktu rilis (*vintage*) antara sumber data.
+
+- Data BPS yang digunakan berasal dari snapshot 20 Oktober 2026.
+- Data WDI yang digunakan berasal dari arsip snapshot 8 Oktober 2026.
+- Perbedaan tanggal snapshot dicatat sebagai konteks waktu pengambilan data. Perbedaan tanggal tersebut tidak dengan sendirinya membuktikan adanya revisi nilai.
+- Pemeriksaan vintage dibedakan dari 28 baris rekonsiliasi karena tidak menjadi kategori pada kolom `kategori` dalam CSV.
+
+Dengan demikian, pembahasan vintage berfungsi sebagai informasi tambahan mengenai asal dan waktu pengambilan data, bukan sebagai kategori tambahan yang mengubah jumlah 28 baris hasil rekonsiliasi.
 
 ### 3. Keterlacakan Data dan Log Keputusan
 
-Seluruh angka dan kategori dalam tabel rekonsiliasi dapat diverifikasi secara mandiri melalui:
-- **Tabel Parquet Gold**: `data/gold/rekonsiliasi.parquet` (28 baris lengkap dengan metrik selisih).
-- **Log Keputusan Tim (`log-keputusan.csv`)**:
-  - `K-002`: Pemisahan baris agregat nasional INDONESIA (9999) var2753 untuk mencegah double counting.
-  - `K-006`: Pemisahan panel var2753 (36 provinsi) dari var2754 (38 provinsi) karena perbedaan cakupan infrastruktur laut vs udara.
-  - `K-009`: Klasifikasi 85 outlier kargo dan transportasi yang dipertahankan valid sesuai sumber.
-  - `K-010`: Dokumentasi patahan metodologi 4 kriteria SDG 11.1.1 var1241 tahun 2019.
-  - `K-013` & `K-014`: Penetapan satuan ton pada var2753 dan identifikasi var2754 sebagai pesawat terbang.
-  - `K-015`: Penetapan kode SDG 11.1.1 dan satuan persen pada WDI EN.POP.SLUM.UR.ZS.
-  - `K-019`: Alokasi 37 baris Silver (25 baris nasional kode 9999 + 12 baris WDI) terpisah ke tabel nasional Gold.
-  - `K-024`: Penyusunan tabel rekonsiliasi 28 baris dan penelusuran kategori penjelasan tanpa modifikasi data asli.
+Hasil rekonsiliasi dapat ditelusuri kembali melalui berkas Gold, tabel CSV, dan log keputusan yang berkaitan dengan proses integrasi dan pembersihan data.
+
+Berkas utama yang digunakan:
+
+- **Parquet Gold:** `data/gold/rekonsiliasi.parquet`, berisi 28 baris hasil rekonsiliasi.
+- **Tabel CSV:** `reports/tabel_rekonsiliasi.csv`, berisi pasangan, periode, nilai utama, nilai pembanding, selisih, persentase selisih, kategori, dan penjelasan.
+- **Log keputusan:** `log-keputusan.csv`, berisi dasar keputusan pengolahan dan penanganan data.
+
+Keputusan yang berkaitan dengan hasil rekonsiliasi antara lain:
+
+- `K-002`: Pemisahan baris agregat nasional `INDONESIA` (9999) pada var2753 untuk mencegah penghitungan ganda.
+- `K-006`: Pemisahan panel var2753 dan var2754 karena perbedaan cakupan data transportasi laut dan udara.
+- `K-009`: Klasifikasi 85 calon anomali yang dipertahankan karena sesuai dengan data sumber.
+- `K-010`: Dokumentasi patahan seri metodologi var1241 sejak 2019.
+- `K-013`: Penetapan satuan ton pada var2753.
+- `K-014`: Identifikasi var2754 sebagai seri bongkar muat barang moda transportasi pesawat terbang.
+- `K-015`: Penetapan kode SDG 11.1.1 dan satuan persen pada seri WDI `EN.POP.SLUM.UR.ZS`.
+- `K-019`: Pengaturan alokasi data nasional Gold.
+- `K-024`: Penyusunan tabel rekonsiliasi 28 baris dan penetapan kategori penjelasan tanpa mengubah data asli.
+
+Dengan rujukan tersebut, angka pada tabel dapat ditelusuri melalui hasil pengolahan Gold dan keputusan yang mendasari proses integrasi. Nilai sumber tetap dipertahankan, sedangkan perbedaan dijelaskan berdasarkan hasil pemeriksaan dan keterbatasan data yang tersedia.
 
 ## Validasi dan reproduksibilitas
 Skema validasi (aturan, hasil lolos/gagal), waktu `python pipeline.py` dari nol, perbandingan pandas
