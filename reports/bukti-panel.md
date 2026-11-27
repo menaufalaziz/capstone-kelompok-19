@@ -9,23 +9,23 @@ Kode keluar: **0**
 ```text
 data/raw: 22 berkas cocok dengan MANIFEST.csv
 ekstraksi: 22 berkas, 5109 baris mentah, 2 format; wilayah_id dengan >1 ejaan: 0, ejaan dengan >1 kode: 0
-ekstraksi  selesai dalam 0.4 s
+ekstraksi  selesai dalam 0.3 s
 Silver berhasil dibuat!
 Lokasi: .\data\silver\silver.parquet
 Jumlah baris: 1295
 Jumlah kolom: 12
 Seri: 6; rincian: 3
 Baris dengan penanda patahan metodologi: 35
-silver     selesai dalam 0.4 s
+silver     selesai dalam 0.3 s
 Panel Gold selesai: 1330 baris (1258 terisi, 72 kosong)
 Panel lebar: 394 baris x 11 kolom
 Baris Silver tidak terpilih ke panel provinsi: 37 baris
 Gold panel unit-safe: 1,330 baris, 5 seri, 7 indikator, 72 sel kosong, 38 baris berpatahan
 Lokasi: .\data\gold
-gold       selesai dalam 1.4 s
+gold       selesai dalam 1.2 s
 Validasi: 1295 baris Silver, 1330 baris panel Gold, 5 seri, 7 indikator
 Laporan: .\reports\validasi.md
-validasi   selesai dalam 1.1 s
+validasi   selesai dalam 1.2 s
 Periksa skema minimal: python -m src.common.skema data/silver/silver.parquet
 ```
 
@@ -36,7 +36,7 @@ Kode keluar: **0**
 ```text
 ...........
 ----------------------------------------------------------------------
-Ran 11 tests in 0.317s
+Ran 11 tests in 0.305s
 
 OK
 ```
@@ -60,6 +60,7 @@ Tidak ada baris kunci kembar pada seluruh tabel panel di atas.
 
 - Sel terisi di `panel_provinsi.parquet`: **1,258** dari 1,330 baris grid.
 - `_baris_silver` dan `_kunci_silver` terisi pada seluruh sel terisi: **1,258** baris.
+- Sel kosong: **72**; memiliki `_baris_silver`: **0**; memiliki `_kunci_silver`: **0**.
 - `_kunci_silver` yang tidak sama dengan kunci baris Silver acuan: **0**.
 - Nilai Gold yang tidak sama dengan nilai Silver setelah konversi satuan (var2754 kg -> ton): **0**.
 
