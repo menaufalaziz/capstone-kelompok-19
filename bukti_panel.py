@@ -135,6 +135,10 @@ def main():
     prov = pd.read_parquet(GOLD / "panel_provinsi.parquet")
     lebar = pd.read_parquet(GOLD / "panel_lebar.parquet")
     kompat = pd.read_parquet(GOLD / "panel.parquet")
+    kosong = prov["nilai_persen"].isna() & prov["nilai_ton"].isna()
+    jumlah_kosong = int(kosong.sum())
+    kosong_berbaris = int(prov.loc[kosong, "_baris_silver"].notna().sum())
+    kosong_berkunci = int(prov.loc[kosong, "_kunci_silver"].notna().sum())
     baris.extend(
         [
             f"| `panel_provinsi.parquet` | `kode_prov + periode + indikator` | "
@@ -152,6 +156,8 @@ def main():
             f"{len(prov):,} baris grid.",
             f"- `_baris_silver` dan `_kunci_silver` terisi pada seluruh sel terisi: "
             f"**{int(prov['_baris_silver'].notna().sum()):,}** baris.",
+            f"- Sel kosong: **{jumlah_kosong:,}**; memiliki `_baris_silver`: "
+            f"**{kosong_berbaris}**; memiliki `_kunci_silver`: **{kosong_berkunci}**.",
             f"- `_kunci_silver` yang tidak sama dengan kunci baris Silver acuan: "
             f"**{beda_kunci}**.",
             f"- Nilai Gold yang tidak sama dengan nilai Silver setelah konversi satuan "
