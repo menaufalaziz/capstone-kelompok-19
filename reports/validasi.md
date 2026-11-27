@@ -1,28 +1,31 @@
 # Laporan validasi
 
-Dihasilkan otomatis oleh `python pipeline.py`.
+Dihasilkan otomatis oleh `python pipeline.py` (tahap 8).
 
 ## Ringkasan
 
 - Baris Silver: 1,295
-- Baris Panel Gold: 1,330
-- Baris Rekonsiliasi: 28
-- Aturan validasi: 10
-- Aturan lolos: 10
+- Seri Silver: 6
+- Wilayah Silver: 39
+- Berkas sumber Silver: 6
+- Baris patahan metodologi: 35
+- Baris panel Gold: 1,330
+- Baris panel panjang kompatibilitas: 1,330
+- Seri panel Gold: 5
+- Indikator panel Gold: 7
+- Sel kosong panel Gold: 72
+- Baris berpatahan panel Gold: 38
 - Hasil: LOLOS
 
 ## Pemeriksaan
 
 | Pemeriksaan | Hasil |
 |---|---|
-| 1. Skema minimal dan lineage MANIFEST | LOLOS |
-| 2. Keunikan kunci Silver | LOLOS |
-| 3. Rentang persen dan berat | LOLOS |
-| 4. Konsistensi satuan Silver | LOLOS |
-| 5. Penanda patahan metodologi | LOLOS |
-| 6. Integritas tabel dasar Gold | LOLOS |
-| 7. Keunikan kunci panel Gold | LOLOS |
-| 8. Konsistensi satuan per indikator Gold | LOLOS |
-| 9. Pasangan setiap sel Gold dengan Silver | LOLOS |
-| 10. Kategori setiap pasangan rekonsiliasi | LOLOS |
-| Integritas status sel panel | LOLOS |
+| Skema minimal dan lineage MANIFEST | lolos |
+| Keunikan kunci Silver | lolos |
+| Rentang persen dan berat | lolos |
+| Konsistensi satuan Silver | lolos |
+| Penanda patahan metodologi | lolos |
+| Panel Gold provinsi dan lineage | lolos |
+| Panel Gold panjang/lebar kompatibilitas | lolos |
+| Kategori pasangan rekonsiliasi | lolos |
