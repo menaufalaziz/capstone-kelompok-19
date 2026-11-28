@@ -1,4 +1,4 @@
-"""Satu perintah reproduksi tim: data mentah -> Silver -> Gold -> validasi.
+"""Satu perintah reproduksi tim: data mentah -> Silver -> Gold -> SQL -> validasi.
 
     python unduh_data.py --kasus <N>     # sekali, isi data/raw/
     python pipeline.py
@@ -11,6 +11,7 @@ import time
 
 from src import ekstraksi, gold, silver, validasi
 from src.common.manifest import periksa
+from src.gold import simpan_sql
 
 
 def main():
@@ -21,6 +22,7 @@ def main():
     for nama, langkah in [("ekstraksi", lambda h: ekstraksi.jalankan()),
                           ("silver", lambda h: silver.jalankan(h["ekstraksi"])),
                           ("gold", lambda h: gold.jalankan(h["silver"])),
+                          ("sql", lambda h: simpan_sql.jalankan(h["silver"])),
                           ("validasi", lambda h: validasi.jalankan(h["silver"], h["gold"]))]:
         mulai = time.time()
         hasil[nama] = langkah(hasil)

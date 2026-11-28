@@ -14,11 +14,14 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import sqlite3
 from datetime import date
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+from src.common.skema import KOLOM, KUNCI
 
 ROOT = Path(__file__).resolve().parent
 GOLD = ROOT / "data" / "gold"
@@ -93,7 +96,9 @@ def periksa_lineage(silver):
 
 def main():
     kode_pipa, log_pipa = jalankan(["pipeline.py"])
-    kode_tes, log_tes = jalankan(["-m", "unittest", "tests/test_gold.py"])
+    kode_tes, log_tes = jalankan(
+        ["-m", "unittest", "tests/test_gold.py", "tests/test_sql.py"]
+    )
 
     silver = pd.read_parquet(SILVER)
     panel, jumlah_terisi, beda_kunci, beda_kolom, beda_nilai, uji, acuan = periksa_lineage(silver)
@@ -111,7 +116,7 @@ def main():
         log_pipa,
         "```",
         "",
-        "## 2. Hasil `python -m unittest tests/test_gold.py`",
+        "## 2. Hasil `python -m unittest tests/test_gold.py tests/test_sql.py`",
         "",
         f"Kode keluar: **{kode_tes}**",
         "",
@@ -219,6 +224,45 @@ def main():
         for nama, jumlah in kategori.items():
             baris.append(f"| {nama} | {jumlah} |")
         baris.append("")
+
+    basis = ROOT / "data" / "silver" / "silver.sqlite"
+    if basis.exists():
+        con = sqlite3.connect(basis)
+        try:
+            jumlah = {
+                tabel: con.execute(f"SELECT COUNT(*) FROM {tabel}").fetchone()[0]
+                for tabel in ("silver", "seri", "wilayah", "berkas_raw")
+            }
+            integritas = con.execute("PRAGMA integrity_check").fetchone()[0]
+            pelanggaran = con.execute("PRAGMA foreign_key_check").fetchall()
+            provinsi = con.execute("SELECT COUNT(*) FROM v_provinsi").fetchone()[0]
+            nasional = con.execute("SELECT COUNT(*) FROM v_nasional").fetchone()[0]
+            db = pd.read_sql_query(
+                "SELECT " + ", ".join(KOLOM) + " FROM silver", con
+            )
+        finally:
+            con.close()
+
+        acuan = silver[KOLOM].sort_values(KUNCI).reset_index(drop=True)
+        hasil = db[KOLOM].sort_values(KUNCI).reset_index(drop=True)
+        identik = acuan.equals(hasil)
+
+        baris.extend(
+            [
+                "## 6. Basis data SQLite",
+                "",
+                f"- Berkas: `{basis.relative_to(ROOT).as_posix()}`.",
+                f"- Tabel: `silver` {jumlah['silver']:,} baris, `seri` "
+                f"{jumlah['seri']}, `wilayah` {jumlah['wilayah']}, `berkas_raw` "
+                f"{jumlah['berkas_raw']}.",
+                f"- `PRAGMA integrity_check`: **{integritas}**; "
+                f"`PRAGMA foreign_key_check`: **{len(pelanggaran)} pelanggaran**.",
+                f"- Pandangan: `v_provinsi` {provinsi:,} baris, `v_nasional` "
+                f"{nasional:,} baris.",
+                f"- Baca-balik SQL sama persis dengan `silver.parquet`: **{identik}**.",
+                "",
+            ]
+        )
 
     LAPORAN.write_text("\n".join(baris), encoding="utf-8")
     print(f"Laporan bukti ditulis: {LAPORAN}")

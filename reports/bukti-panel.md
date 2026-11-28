@@ -9,7 +9,7 @@ Kode keluar: **0**
 ```text
 data/raw: 22 berkas cocok dengan MANIFEST.csv
 ekstraksi: 22 berkas, 5109 baris mentah, 2 format; wilayah_id dengan >1 ejaan: 0, ejaan dengan >1 kode: 0
-ekstraksi  selesai dalam 0.3 s
+ekstraksi  selesai dalam 0.4 s
 Silver berhasil dibuat!
 Lokasi: .\data\silver\silver.parquet
 Jumlah baris: 1295
@@ -22,21 +22,24 @@ Panel lebar: 394 baris x 11 kolom
 Baris Silver tidak terpilih ke panel provinsi: 37 baris
 Gold panel unit-safe: 1,330 baris, 5 seri, 7 indikator, 72 sel kosong, 38 baris berpatahan
 Lokasi: .\data\gold
-gold       selesai dalam 1.2 s
+gold       selesai dalam 1.3 s
+SQLite Silver: 1,295 baris, 6 seri, 39 wilayah, 22 berkas mentah
+Lokasi: .\data\silver\silver.sqlite
+sql        selesai dalam 0.1 s
 Validasi: 1295 baris Silver, 1330 baris panel Gold, 5 seri, 7 indikator
 Laporan: .\reports\validasi.md
 validasi   selesai dalam 1.2 s
 Periksa skema minimal: python -m src.common.skema data/silver/silver.parquet
 ```
 
-## 2. Hasil `python -m unittest tests/test_gold.py`
+## 2. Hasil `python -m unittest tests/test_gold.py tests/test_sql.py`
 
 Kode keluar: **0**
 
 ```text
-...........
+.................
 ----------------------------------------------------------------------
-Ran 11 tests in 0.305s
+Ran 17 tests in 0.466s
 
 OK
 ```
@@ -101,3 +104,11 @@ bps|var1241|1100|2017|Tidak ada|bps/2026-10-20/sdg11_11_1_1_a_v1241.csv
 | Metode berbeda | 14 |
 | Cakupan berbeda | 10 |
 | Definisi berbeda | 4 |
+
+## 6. Basis data SQLite
+
+- Berkas: `data/silver/silver.sqlite`.
+- Tabel: `silver` 1,295 baris, `seri` 6, `wilayah` 39, `berkas_raw` 22.
+- `PRAGMA integrity_check`: **ok**; `PRAGMA foreign_key_check`: **0 pelanggaran**.
+- Pandangan: `v_provinsi` 1,258 baris, `v_nasional` 37 baris.
+- Baca-balik SQL sama persis dengan `silver.parquet`: **True**.

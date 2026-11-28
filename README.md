@@ -27,7 +27,7 @@ diperhatikan untuk kasus Anda. `data/raw/` tidak di-commit; anggota lain cukup m
 
 ```text
 unduh_data.py          milik starter — unduh paket kasus dari Release dan periksa sha256
-pipeline.py            satu perintah reproduksi: ekstraksi -> silver -> gold -> validasi
+pipeline.py            satu perintah reproduksi: ekstraksi -> silver -> gold -> sql -> validasi
 src/common/            milik starter — jangan diubah: manifest (lineage sha256), skema (pemeriksa Silver),
                        hasil (results/<nim>/metrics.json untuk bukti artefak di Workbench)
 src/ekstraksi/         tahap 1: pembaca tiap format
@@ -66,7 +66,7 @@ reports/tim.md, reports/individu/<nim>.md, AI_LOG.md
 - **Periode**: `2020` (tahun), `2020-S1` (semester), `2020-Q3` (triwulan), `2020-07` (bulan).
 - **Lineage**: `_sha256_raw` diambil dari `src.common.manifest.sha256_raw`, tidak ditulis tangan.
 - **Satu perintah**: `python pipeline.py` dari `data/raw/` yang baru diunduh harus menghasilkan
-  ulang Silver dan Gold yang di-commit.
+  ulang Silver, Gold, dan basis data SQLite `data/silver/silver.sqlite`.
 
 ## Pembagian peran yang disarankan
 

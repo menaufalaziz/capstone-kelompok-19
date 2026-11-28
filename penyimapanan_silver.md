@@ -1,7 +1,8 @@
 # Penyimpanan Silver (Tahap 5) — draf untuk laporan tim
 
 DDL: `sql/silver_sqlite.sql`. Pemuat dan pengujian: `python -m src.gold.simpan_sql` (menghasilkan
-`data/silver/silver.sqlite`, tidak di-commit). Diuji pada SQLite 3.53.1 (Linux); belum diuji di Windows.
+`data/silver/silver.sqlite`, tidak di-commit) dan `python -m unittest tests/test_sql.py`.
+Diuji pada SQLite 3.49.1 (Windows) dan 3.53.1 (Linux).
 Tabel STRICT butuh SQLite 3.37 ke atas; pemuat memberi pesan jelas bila versinya lebih lama.
 
 ## Skema
