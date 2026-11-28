@@ -52,7 +52,7 @@ import pandas as pd
 
 from src.common.skema import KUNCI
 from src.gold import panel as panel_lama
-from src.gold import rekonsiliasi
+from src.gold import nasional, rekonsiliasi
 from src.silver.katalog import ambil as ambil_katalog
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -409,8 +409,9 @@ def jalankan(silver):
     hasil["panel_provinsi"] = gabungan
     hasil["panel_dasar"] = panel_dasar
 
-    # Tahap 6: Bangun tabel rekonsiliasi.
+    # Tahap 6: Bangun tabel rekonsiliasi 
     df_rekon = rekonsiliasi.jalankan(silver, hasil.get("panel"))
     hasil["rekonsiliasi"] = df_rekon
+    hasil["nasional"] = nasional.jalankan(silver)
 
     return hasil
